@@ -90,6 +90,107 @@ function addTechInterfaceMotion() {
    backToTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
+function addAiChatbotWidget() {
+   if (document.querySelector(".ai-chatbot")) return;
+
+   const answers = [
+      {
+         keywords: ["admission", "apply", "ielts", "sat", "ent", "requirement", "поступ", "ент", "треб", "ielts"],
+         text: "Admissions require ENT or SAT results, IELTS or an English test, and a motivation letter. You can contact admissions at admissions@au.edu.kz.",
+      },
+      {
+         keywords: ["scholarship", "grant", "грант", "стипенд", "scholarships"],
+         text: "AU scholarship tracks include AI Talent, Future Leaders, Girls in Tech, and Founder. Strong projects, leadership, competition results, and motivation matter.",
+      },
+      {
+         keywords: ["school", "schools", "nexus", "vitalis", "quantum", "agronova", "lumen", "школ"],
+         text: "AU has five schools: NEXUS Engineering, VITALIS Healthcare Innovation, QUANTUM Finance & Analytics, AGRONOVA Smart Agriculture, and LUMEN Education & Human Learning.",
+      },
+      {
+         keywords: ["internship", "practice", "career", "job", "стаж", "карьер", "практик"],
+         text: "The model is industry-driven, with practical labs, corporate partners, startup culture, and internship opportunities from Year 1.",
+      },
+      {
+         keywords: ["contact", "email", "phone", "связ", "контакт"],
+         text: "You can reach AU at info@au.edu.kz. For admissions questions, write to admissions@au.edu.kz.",
+      },
+   ];
+
+   const quickPrompts = ["Admissions", "Scholarships", "Five schools"];
+   const widget = document.createElement("section");
+   widget.className = "ai-chatbot";
+   widget.setAttribute("aria-label", "AI assistant");
+   widget.innerHTML = `
+      <div class="ai-chatbot-panel" role="dialog" aria-label="AI assistant chat">
+         <div class="ai-chatbot-header">
+            <div class="ai-chatbot-title">
+               <span><i class="ri-robot-2-line"></i></span>
+               <div><strong>AU AI Assistant</strong><small>Admissions, grants, schools</small></div>
+            </div>
+            <button class="ai-chatbot-close" type="button" aria-label="Close assistant"><i class="ri-close-line"></i></button>
+         </div>
+         <div class="ai-chatbot-messages" aria-live="polite"></div>
+         <div class="ai-chatbot-prompts"></div>
+         <form class="ai-chatbot-form">
+            <input class="ai-chatbot-input" type="text" autocomplete="off" placeholder="Ask about AU..." aria-label="Ask AI assistant" />
+            <button class="ai-chatbot-send" type="submit" aria-label="Send message"><i class="ri-send-plane-2-line"></i></button>
+         </form>
+      </div>
+      <button class="ai-chatbot-toggle" type="button" aria-label="Open AI assistant"><i class="ri-robot-2-line"></i></button>
+   `;
+
+   document.body.appendChild(widget);
+
+   const toggle = widget.querySelector(".ai-chatbot-toggle");
+   const close = widget.querySelector(".ai-chatbot-close");
+   const messages = widget.querySelector(".ai-chatbot-messages");
+   const prompts = widget.querySelector(".ai-chatbot-prompts");
+   const form = widget.querySelector(".ai-chatbot-form");
+   const input = widget.querySelector(".ai-chatbot-input");
+
+   function addMessage(text, type = "bot") {
+      const message = document.createElement("div");
+      message.className = `ai-message ${type}`;
+      message.textContent = text;
+      messages.appendChild(message);
+      messages.scrollTop = messages.scrollHeight;
+   }
+
+   function findAnswer(text) {
+      const normalized = text.toLowerCase();
+      const match = answers.find((item) => item.keywords.some((keyword) => normalized.includes(keyword)));
+      return match?.text || "I can help with admissions, scholarships, the five schools, internships, and AU contacts. Try asking: 'What scholarships are available?'";
+   }
+
+   quickPrompts.forEach((label) => {
+      const button = document.createElement("button");
+      button.className = "ai-prompt";
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", () => {
+         addMessage(label, "user");
+         addMessage(findAnswer(label));
+      });
+      prompts.appendChild(button);
+   });
+
+   addMessage("Hi, I am the AU AI assistant. Ask me about admissions, scholarships, internships, or the five schools.");
+
+   toggle.addEventListener("click", () => {
+      widget.classList.toggle("is-open");
+      if (widget.classList.contains("is-open")) input.focus();
+   });
+   close.addEventListener("click", () => widget.classList.remove("is-open"));
+   form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      input.value = "";
+      window.setTimeout(() => addMessage(findAnswer(text)), 280);
+   });
+}
+
 function drawFallbackModel() {
    if (!canvas) return;
 
@@ -405,4 +506,5 @@ async function initHeroModel() {
 addRevealAnimations();
 addParallaxMotion();
 addTechInterfaceMotion();
+addAiChatbotWidget();
 initHeroModel();
