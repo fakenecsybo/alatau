@@ -562,7 +562,7 @@
    }
 
    function getTranslatableElements() {
-      return Array.from(document.body.querySelectorAll("a, button span, h1, h2, h3, p, small, figcaption span, figcaption strong, article span, .funnel-card span, .partner-strip span"));
+      return Array.from(document.body.querySelectorAll("a, button span, h1, h2, h3, p, small, figcaption span, figcaption strong, article span, .hero-panel span, .hero-panel strong, .funnel-card span, .partner-strip span"));
    }
 
    function rememberSource(element) {
