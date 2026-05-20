@@ -6,7 +6,7 @@ function cssColor(name) {
 
 function addRevealAnimations() {
    const revealTargets = document.querySelectorAll(
-      ".section-heading, .info-card, .stats-grid article, .program-card, .practice-visual, .feature-list article, .campus, .logo-grid span, .news-card, .admissions, .page-card, .download-card, .funnel-card"
+      ".section-heading, .info-card, .stats-grid article, .program-card, .practice-visual, .feature-list article, .campus, .logo-card, .news-card, .admissions, .page-card, .download-card, .funnel-card, .embed-card"
    );
 
    revealTargets.forEach((item) => item.classList.add("reveal"));
@@ -53,6 +53,41 @@ function addParallaxMotion() {
    update();
    window.addEventListener("scroll", requestUpdate, { passive: true });
    window.addEventListener("resize", requestUpdate);
+}
+
+function addTechInterfaceMotion() {
+   const backToTop = document.querySelector(".back-to-top");
+   let ticking = false;
+
+   function syncScrollState() {
+      const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      const progress = Math.min(window.scrollY / maxScroll, 1);
+      document.body.style.setProperty("--scroll-progress", progress.toFixed(4));
+      if (backToTop) {
+         backToTop.classList.toggle("is-visible", window.scrollY > window.innerHeight * 0.7);
+      }
+      ticking = false;
+   }
+
+   function requestScrollSync() {
+      if (!ticking) {
+         requestAnimationFrame(syncScrollState);
+         ticking = true;
+      }
+   }
+
+   function syncPointer(event) {
+      const x = `${Math.round(event.clientX)}px`;
+      const y = `${Math.round(event.clientY)}px`;
+      document.body.style.setProperty("--pointer-x", x);
+      document.body.style.setProperty("--pointer-y", y);
+   }
+
+   syncScrollState();
+   window.addEventListener("scroll", requestScrollSync, { passive: true });
+   window.addEventListener("resize", requestScrollSync);
+   window.addEventListener("pointermove", syncPointer, { passive: true });
+   backToTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
 function drawFallbackModel() {
@@ -369,4 +404,5 @@ async function initHeroModel() {
 
 addRevealAnimations();
 addParallaxMotion();
+addTechInterfaceMotion();
 initHeroModel();

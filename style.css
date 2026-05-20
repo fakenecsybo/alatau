@@ -30,6 +30,41 @@ body {
    font-family: "Inter", "Montserrat", Arial, sans-serif;
    transition: background-color 0.35s ease, color 0.35s ease;
    overflow-x: hidden;
+   --scroll-progress: 0;
+   --pointer-x: 50vw;
+   --pointer-y: 24vh;
+}
+
+body::before {
+   content: "";
+   position: fixed;
+   inset: 0;
+   z-index: 0;
+   pointer-events: none;
+   background:
+      radial-gradient(circle at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--ai-blue) 20%, transparent), transparent 24rem),
+      linear-gradient(90deg, color-mix(in srgb, var(--ai-blue) 8%, transparent) 1px, transparent 1px),
+      linear-gradient(180deg, color-mix(in srgb, var(--ai-blue) 8%, transparent) 1px, transparent 1px);
+   background-size: auto, 72px 72px, 72px 72px;
+   opacity: 0.42;
+   mask-image: linear-gradient(180deg, #000 0 74%, transparent);
+}
+
+body::after {
+   content: "";
+   position: fixed;
+   inset: 0;
+   z-index: 0;
+   pointer-events: none;
+   background: linear-gradient(115deg, transparent 0 42%, color-mix(in srgb, var(--ai-blue) 12%, transparent) 48%, transparent 54%);
+   opacity: 0.22;
+   animation: dataSweep 12s linear infinite;
+}
+
+main,
+.footer {
+   position: relative;
+   z-index: 1;
 }
 
 body[data-theme="dark"] {
@@ -98,6 +133,18 @@ a {
    -webkit-backdrop-filter: blur(22px);
    box-shadow: 0 16px 42px rgba(3, 17, 66, 0.16);
    animation: headerDrop 0.8s ease both;
+}
+
+.site-header::after {
+   content: "";
+   position: absolute;
+   left: 0;
+   right: 0;
+   bottom: -1px;
+   height: 2px;
+   background: linear-gradient(90deg, var(--ai-blue), color-mix(in srgb, var(--ai-blue) 18%, #ffffff));
+   transform: scaleX(var(--scroll-progress));
+   transform-origin: left;
 }
 
 .brand {
@@ -477,7 +524,7 @@ body[data-theme="dark"] .hero-panel {
 .news-card:hover,
 .stats-grid article:hover,
 .feature-list article:hover,
-.logo-grid span:hover {
+.logo-card:hover {
    transform: translateY(-8px) rotateX(2deg);
    border-color: color-mix(in srgb, var(--ai-blue) 64%, var(--border));
    box-shadow: 0 26px 70px rgba(0, 0, 0, 0.22), 0 0 0 1px color-mix(in srgb, var(--ai-blue) 30%, transparent);
@@ -487,6 +534,54 @@ body[data-theme="dark"] .hero-panel {
 .program-card {
    min-height: 250px;
    padding: 26px;
+}
+
+.info-card,
+.program-card,
+.stats-grid article,
+.feature-list article,
+.page-card,
+.download-card,
+.funnel-card,
+.logo-card,
+.news-card,
+.embed-card {
+   position: relative;
+   overflow: hidden;
+}
+
+.info-card::after,
+.program-card::after,
+.stats-grid article::after,
+.feature-list article::after,
+.page-card::after,
+.download-card::after,
+.funnel-card::after,
+.logo-card::after,
+.news-card::after,
+.embed-card::after {
+   content: "";
+   position: absolute;
+   inset: 0;
+   background: linear-gradient(120deg, transparent 0 38%, color-mix(in srgb, var(--ai-blue) 18%, transparent) 48%, transparent 58%);
+   opacity: 0;
+   transform: translateX(-120%);
+   transition: opacity 0.3s ease, transform 0.8s ease;
+   pointer-events: none;
+}
+
+.info-card:hover::after,
+.program-card:hover::after,
+.stats-grid article:hover::after,
+.feature-list article:hover::after,
+.page-card:hover::after,
+.download-card:hover::after,
+.funnel-card:hover::after,
+.logo-card:hover::after,
+.news-card:hover::after,
+.embed-card:hover::after {
+   opacity: 1;
+   transform: translateX(120%);
 }
 
 .info-card i,
@@ -661,11 +756,14 @@ body[data-theme="dark"] .hero-panel {
    margin-top: 34px;
 }
 
-.logo-grid span {
+.logo-card {
    display: grid;
-   place-items: center;
-   min-height: 90px;
-   padding: 18px;
+   grid-template-rows: minmax(74px, 1fr) auto;
+   align-items: center;
+   justify-items: center;
+   gap: 12px;
+   min-height: 130px;
+   padding: 14px;
    border-radius: var(--radius);
    border: 1px solid var(--border);
    background: var(--surface-card);
@@ -673,6 +771,34 @@ body[data-theme="dark"] .hero-panel {
    font-weight: 800;
    text-align: center;
    transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.logo-card::before {
+   content: "";
+   grid-area: 1 / 1;
+   width: 100%;
+   height: 100%;
+   min-height: 74px;
+   border-radius: calc(var(--radius) - 2px);
+   background: #ffffff;
+   box-shadow: inset 0 0 0 1px rgba(3, 17, 66, 0.08);
+}
+
+.logo-card img {
+   grid-area: 1 / 1;
+   display: block;
+   width: min(138px, calc(100% - 22px));
+   max-height: 56px;
+   object-fit: contain;
+   position: relative;
+   z-index: 1;
+}
+
+.logo-card figcaption {
+   color: var(--text-secondary);
+   font-size: 0.82rem;
+   font-weight: 800;
+   line-height: 1.25;
 }
 
 .news-grid {
@@ -805,6 +931,45 @@ body[data-theme="dark"] .hero-panel {
    transform: translateY(0);
 }
 
+.back-to-top {
+   position: fixed;
+   right: clamp(18px, 3vw, 34px);
+   bottom: clamp(18px, 3vw, 34px);
+   z-index: 30;
+   display: grid;
+   place-items: center;
+   width: 48px;
+   height: 48px;
+   border: 1px solid color-mix(in srgb, var(--ai-blue) 62%, var(--border));
+   border-radius: var(--radius);
+   background: color-mix(in srgb, var(--surface) 88%, transparent);
+   color: var(--ai-blue);
+   box-shadow: 0 18px 42px rgba(3, 17, 66, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+   backdrop-filter: blur(18px);
+   -webkit-backdrop-filter: blur(18px);
+   cursor: pointer;
+   opacity: 0;
+   pointer-events: none;
+   transform: translateY(16px) scale(0.94);
+   transition: opacity 0.24s ease, transform 0.24s ease, background-color 0.24s ease;
+}
+
+.back-to-top i {
+   font-size: 1.25rem;
+}
+
+.back-to-top.is-visible {
+   opacity: 1;
+   pointer-events: auto;
+   transform: translateY(0) scale(1);
+}
+
+.back-to-top:hover {
+   background: var(--ai-blue);
+   color: var(--on-primary);
+   transform: translateY(-3px) scale(1.02);
+}
+
 @keyframes headerDrop {
    from {
       opacity: 0;
@@ -855,6 +1020,7 @@ body[data-theme="dark"] .hero-panel {
       scroll-behavior: auto !important;
       transition-duration: 0.001ms !important;
    }
+
 }
 
 .news-card div {
